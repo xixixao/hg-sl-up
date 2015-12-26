@@ -1,0 +1,11 @@
+{
+  "name": "hg-sl-up",
+  "version": "0.1.0",
+  "description": "hg update to bookmarks and commits interactively via keyboard",
+  "bin": "hg-sl-up.sh",
+  "author": "xixixao",
+  "license": "MIT",
+  "dependencies": {
+    "keypress": "^0.2.1"
+  }
+}
