@@ -43,8 +43,8 @@ if [ $to -gt 1 ]; then
 fi
 
 # split arg list
-sl_args=${@:0:$to}
-up_args=${@:($sep + 2)}
+sl_args=${args[@]:0:$to}
+up_args=${args[@]:($sep + 2)}
 
 # Get path to our node module
 SOURCE="${BASH_SOURCE[0]}"
