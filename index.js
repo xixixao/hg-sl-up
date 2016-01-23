@@ -8,7 +8,7 @@ var keypress = require('keypress');
 var eol = require('os').EOL;
 var exec = child_process.exec;
 
-var cmd = 'hg --color always sl ' + process.argv.join(' ');
+var cmd = 'hg --color always sl ' + process.argv.slice(2).join(' ');
 
 var currentCommitMarker = '@';
 
