@@ -134,7 +134,7 @@ function up() {
 
   } else {
     var commit = output[_line(commitPos)]
-      .match(/\S{6}/)[0];
+      .match(/\S{6,9}/)[0];
   }
   // Use a tempfile unfortunately
   fs.writeFileSync('.____hg-sl-up-to', bookmark || commit);
