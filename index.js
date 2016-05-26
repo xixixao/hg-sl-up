@@ -18,7 +18,7 @@ var bookmarkIndex;
 
 exec(cmd, function(error, stdout, stderr) {
   output = stdout
-    .replace(/\033\[35m/g, '')
+    .replace(/\033\[(0;)?35m/g, '')
     .replace(/\r\n/g, '\n')
     .split('\n');
   commitPos = search(1, [-1, 0], /^(\|\s)*@/, output);
@@ -130,7 +130,7 @@ function up() {
   if (bookmarkIndex !== -1) {
     var bookmark = output[_line(commitPos)]
       .substring(bookmarkIndex)
-      .match(/\033\[0;32m([^\s\*]+)/)[1];
+      .match(/\033\[0;32m\s*([^\s\*]+)/)[1];
 
   } else {
     var commit = output[_line(commitPos)]
