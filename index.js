@@ -91,7 +91,10 @@ process.stdin.on('keypress', function (ch, key) {
       break;
     case 'return':
     case 'enter':
-      up();
+      upCurrent();
+      break;
+    case 'u':
+      upParent();
       break;
   }
   if (key.ctrl && key.name == 'c'
@@ -125,7 +128,16 @@ function updateBookmark(direction) {
   render();
 }
 
-function up() {
+function upCurrent() {
+  up(function (to) {return to;});
+}
+
+
+function upParent() {
+  up(function (to) {return to + '^';});
+}
+
+function up(toModifier) {
   process.stdin.pause();
   if (bookmarkIndex !== -1) {
     var bookmark = output[_line(commitPos)]
@@ -137,7 +149,7 @@ function up() {
       .match(/\S{6,9}/)[0];
   }
   // Use a tempfile unfortunately
-  fs.writeFileSync('.____hg-sl-up-to', bookmark || commit);
+  fs.writeFileSync('.____hg-sl-up-to', toModifier(bookmark || commit));
 }
 
 function insertAll(whatWhere, to) {
