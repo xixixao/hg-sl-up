@@ -75,7 +75,7 @@ function markRebasePos(lines) {
     var line = lines[_line(rebasingPos)];
     var col = _col(rebasingPos);
     lines[_line(rebasingPos)] =
-      line.slice(0, col) + '\033[0;1m←\033[0m' + line.slice(col + 1);
+      line.slice(0, col) + '\033[0;1m\u2190\033[0m' + line.slice(col + 1);
   }
 }
 
