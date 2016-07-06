@@ -166,8 +166,13 @@ function up(toModifier) {
 }
 
 function rebaseFromCurrent() {
-  rebasing = currentTarget();
-  rebasingPos = commitPos;
+  if (rebasing) {
+    rebasing = null;
+    rebasingPos = null;
+  } else {
+    rebasing = currentTarget();
+    rebasingPos = commitPos;
+  }
   render();
 }
 
