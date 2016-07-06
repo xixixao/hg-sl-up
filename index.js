@@ -43,7 +43,7 @@ function render() {
   var toRender = insertAll(colors, output);
 
   var numLinesToRender = process.stdout.rows;
-  var numCharsToRedner = process.stdout.columns;
+  var numCharsToRender = process.stdout.columns;
   var to = Math.max(numLinesToRender, lineAfter + 1);
   process.stdout.write(
     '\033[2J' +
@@ -52,7 +52,7 @@ function render() {
 
     toRender
       .slice(to - numLinesToRender, to - 1)
-      .map(function (line) {return line.slice(0, numCharsToRedner);})
+      .map(function (line) {return line.slice(0, numCharsToRender);})
       .join('\033[0m' + eol) +
     eol // ensure last line is empty
   );
