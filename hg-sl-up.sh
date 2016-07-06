@@ -49,7 +49,7 @@ fi
 
 # split arg list
 sl_args=${args[@]:0:$to}
-up_args=${args[@]:($sep + 2)}
+command_args=${args[@]:($sep + 1)}
 
 # Get path to our node module
 SOURCE="${BASH_SOURCE[0]}"
