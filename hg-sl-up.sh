@@ -63,9 +63,21 @@ node "$DIR/index.js" $sl_args
 # No way to execute so node knows the window size and save output as well
 # TO="$(node "$DIR/index.js" $sl_args | tee /dev/tty | tail -n1)"
 
+UP_FILE=".____hg-sl-up-to"
+REBASE_FILE=".____hg-sl-rebase-to"
+
 # So use a tempfile
-TO=`cat .____hg-sl-up-to`
-rm ".____hg-sl-up-to"
+
+if [[ -f $UP_FILE ]]; then
+  ARGS=`cat $UP_FILE`
+  rm $UP_FILE
+  HG_COMMAND="up"
+else
+  ARGS=`cat $REBASE_FILE`
+  rm $REBASE_FILE
+  HG_COMMAND="rebase"
+fi
+
 tput rmcup && stty echo && # leave fullscreen
-[[ ! -z  $TO ]] &&
-hg up ${up_args[@]} $TO
+[[ ! -z  $ARGS ]] &&
+hg $HG_COMMAND ${command_args[@]} $ARGS

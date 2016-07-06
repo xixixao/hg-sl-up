@@ -15,6 +15,7 @@ var currentCommitMarker = '@';
 var output;
 var commitPos;
 var bookmarkIndex;
+var rebasing;
 
 exec(cmd, function(error, stdout, stderr) {
   output = stdout
@@ -91,10 +92,13 @@ process.stdin.on('keypress', function (ch, key) {
       break;
     case 'return':
     case 'enter':
-      upCurrent();
+      finishCurrent();
       break;
     case 'u':
-      upParent();
+      finishParent();
+      break;
+    case 'r':
+      rebaseFromCurrent();
       break;
   }
   if (key.ctrl && key.name == 'c'
@@ -128,17 +132,42 @@ function updateBookmark(direction) {
   render();
 }
 
-function upCurrent() {
-  up(function (to) {return to;});
+function finishCurrent() {
+  finish(function (to) {return to;});
 }
 
+function finishParent() {
+  finish(function (to) {return to + '^';});
+}
 
-function upParent() {
-  up(function (to) {return to + '^';});
+function finish(toModifier) {
+  if (rebasing) {
+    rebaseToCurrent(toModifier);
+  } else {
+    up(toModifier);
+  }
 }
 
 function up(toModifier) {
   process.stdin.pause();
+  // Use a tempfile unfortunately
+  fs.writeFileSync('.____hg-sl-up-to', toModifier(currentTarget()));
+}
+
+function rebaseFromCurrent() {
+  rebasing = currentTarget();
+}
+
+function rebaseToCurrent(toModifier) {
+  process.stdin.pause();
+  var from = rebasing;
+  var to = toModifier(currentTarget());
+  // Use a tempfile unfortunately
+  fs.writeFileSync('.____hg-sl-rebase-to',
+    '-s' + ' ' + from + ' ' + '-d' + ' ' + to);
+}
+
+function currentTarget() {
   if (bookmarkIndex !== -1) {
     var bookmark = output[_line(commitPos)]
       .substring(bookmarkIndex)
@@ -149,7 +178,7 @@ function up(toModifier) {
       .match(/\S{6,9}/)[0];
   }
   // Use a tempfile unfortunately
-  fs.writeFileSync('.____hg-sl-up-to', toModifier(bookmark || commit));
+  return bookmark || commit;
 }
 
 function insertAll(whatWhere, to) {
