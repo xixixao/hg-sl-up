@@ -105,7 +105,7 @@ process.stdin.on('keypress', function (ch, key) {
     case 'enter':
       finishCurrent();
       break;
-    case 'u':
+    case 'p':
       finishParent();
       break;
     case 'r':
@@ -166,11 +166,12 @@ function up(toModifier) {
 }
 
 function rebaseFromCurrent() {
-  if (rebasing) {
+  var current = currentTarget();
+  if (rebasing == current) {
     rebasing = null;
     rebasingPos = null;
   } else {
-    rebasing = currentTarget();
+    rebasing = current;
     rebasingPos = commitPos;
   }
   render();
