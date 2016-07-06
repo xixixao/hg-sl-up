@@ -16,6 +16,7 @@ var output;
 var commitPos;
 var bookmarkIndex;
 var rebasing;
+var rebasingPos;
 
 exec(cmd, function(error, stdout, stderr) {
   output = stdout
@@ -41,6 +42,7 @@ function render() {
   colors['\033[35m'] = colorMarkersForCommit(lineAfter);
 
   var toRender = insertAll(colors, output);
+  markRebasePos(toRender);
 
   var numLinesToRender = process.stdout.rows;
   var numCharsToRender = process.stdout.columns;
@@ -66,6 +68,15 @@ function colorMarkersForCommit(lineAfter) {
     markers.push(add(commitPos, [i, 2]));
   }
   return markers;
+}
+
+function markRebasePos(lines) {
+  if (rebasing) {
+    var line = lines[_line(rebasingPos)];
+    var col = _col(rebasingPos);
+    lines[_line(rebasingPos)] =
+      line.slice(0, col) + '\033[0;1m←\033[0m' + line.slice(col + 1);
+  }
 }
 
 // make `process.stdin` begin emitting "keypress" events
@@ -156,6 +167,8 @@ function up(toModifier) {
 
 function rebaseFromCurrent() {
   rebasing = currentTarget();
+  rebasingPos = commitPos;
+  render();
 }
 
 function rebaseToCurrent(toModifier) {
@@ -182,13 +195,13 @@ function currentTarget() {
 }
 
 function insertAll(whatWhere, to) {
+  var inserted = to.slice();
   return Object.keys(whatWhere).reduce(function (to, what) {
     return insert(what, whatWhere[what], to);
-  }, to);
+  }, inserted);
 }
 
-function insert(what, positions, where) {
-  var inserted = where.slice();
+function insert(what, positions, inserted) {
   for (var i = 0; i < positions.length; i++) {
     var pos = positions[i];
     var oldLine = inserted[_line(pos)];
