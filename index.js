@@ -105,7 +105,7 @@ process.stdin.on('keypress', function (ch, key) {
     case 'enter':
       finishCurrent();
       break;
-    case 'u':
+    case 'p':
       finishParent();
       break;
     case 'r':
