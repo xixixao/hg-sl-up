@@ -137,9 +137,11 @@ function lineAfterCommit() {
 }
 
 function updateBookmark(direction) {
-  var fromIndex = bookmarkIndex + direction;
-  bookmarkIndex =
-    indexOf(direction, fromIndex, '\033[0;32m', output[_line(commitPos)]);
+  var line = output[_line(commitPos)];
+  var fromIndex = bookmarkIndex === -1 && direction === -1
+    ? line.length - 1
+    : bookmarkIndex + direction;
+  bookmarkIndex = indexOf(direction, fromIndex, '\033[0;32m', line);
   render();
 }
 
