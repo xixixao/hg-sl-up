@@ -23,7 +23,7 @@ exec(cmd, function(error, stdout, stderr) {
     .replace(/\033\[(0;)?35m/g, '')
     .replace(/\r\n/g, '\n')
     .split('\n');
-  commitPos = search(1, [-1, 0], /^(\|\s)*@/, output);
+  commitPos = search(1, [-1, 0], /^((?:\|\s))*@/, output);
   bookmarkIndex = indexOf(1, 0, '\033[0;33m', output[_line(commitPos)]);
   output[_line(commitPos)] = output[_line(commitPos)]
     .replace(/\033\[0;33m/, '\033[0;32m');
@@ -124,7 +124,7 @@ process.stdin.resume();
 
 function updateCommit(direction) {
   commitPos =
-    search(direction, commitPos, /^(\|\s)*[o@]/, output) || commitPos;
+    search(direction, commitPos, /^((?:\|\s)*)[o@]/, output) || commitPos;
   bookmarkIndex = indexOf(1, 0, '\033[0;32m', output[_line(commitPos)]);
   render();
 }
