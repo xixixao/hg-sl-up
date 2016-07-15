@@ -31,50 +31,54 @@ exec(cmd, function(error, stdout, stderr) {
 });
 
 function render() {
+  var numLinesToRender = process.stdout.rows;
+  var numCharsToRender = process.stdout.columns;
+  var lineAfter = lineAfterCommit();
+  var to = Math.max(numLinesToRender, lineAfter + 1);
+  var from = to - numLinesToRender;
+
+  renderBuffer = output
+    .slice(from, to - 1)
+    .map(function (line) {return line.slice(0, numCharsToRender);});
+
   var colors = {};
   if (bookmarkIndex !== -1) {
     colors['\033[0;33m'] = [
-      [_line(commitPos), bookmarkIndex + 7],
+      [_line(commitPos) - from, bookmarkIndex + 7],
     ];
   }
 
-  var lineAfter = lineAfterCommit();
-  colors['\033[35m'] = colorMarkersForCommit(lineAfter);
+  colors['\033[35m'] = colorMarkersForCommit(lineAfter, from);
 
-  var toRender = insertAll(colors, output);
-  markRebasePos(toRender);
+  insertAll(colors, renderBuffer);
+  markRebasePos(renderBuffer, from);
 
-  var numLinesToRender = process.stdout.rows;
-  var numCharsToRender = process.stdout.columns;
-  var to = Math.max(numLinesToRender, lineAfter + 1);
   process.stdout.write(
     '\033[2J' +
     '\033[0f' +
     '\033[0m' +
 
-    toRender
-      .slice(to - numLinesToRender, to - 1)
-      .map(function (line) {return line.slice(0, numCharsToRender);})
-      .join('\033[0m' + eol) +
+    renderBuffer.join('\033[0m' + eol) +
     eol // ensure last line is empty
   );
 }
 
-function colorMarkersForCommit(lineAfter) {
+function colorMarkersForCommit(lineAfter, lineOffset) {
   var markers = [];
   var to = lineAfter - _line(commitPos);
   var markers = [];
   for (var i = 0; i < to; i++) {
-    markers.push(add(commitPos, [i, 2]));
+    markers.push(add(commitPos, [i - lineOffset, 2]));
   }
   return markers;
 }
 
-function markRebasePos(lines) {
+function markRebasePos(lines, lineOffset) {
   if (rebasing) {
-    var line = lines[_line(rebasingPos)];
+    var i = _line(rebasingPos) - lineOffset;
+    var line = lines[i];
     var col = _col(rebasingPos);
-    lines[_line(rebasingPos)] =
+    lines[i] =
       line.slice(0, col) + '\033[0;1m\u2190\033[0m' + line.slice(col + 1);
   }
 }
@@ -203,10 +207,9 @@ function currentTarget() {
 }
 
 function insertAll(whatWhere, to) {
-  var inserted = to.slice();
   return Object.keys(whatWhere).reduce(function (to, what) {
     return insert(what, whatWhere[what], to);
-  }, inserted);
+  }, to);
 }
 
 function insert(what, positions, inserted) {
